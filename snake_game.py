@@ -23,14 +23,15 @@ snk_y = window_height // 2
 
 #define the body of the snake
 snake = [
-  [snk_y, snk_x],      #head
-  [snk_y, snk_x - 1],  #body
-  [snk_y, snk_x - 2]   #tail
+    [snk_y, snk_x],  #head
+    [snk_y, snk_x - 1],  #body
+    [snk_y, snk_x - 2]  #tail
 ]
 
 #define the food
 food = [window_height // 2, window_width // 2]
-window.addch(food[0], food[1], curses.ACS_PI) #available after initscr() has been called
+window.addch(food[0], food[1],
+             curses.ACS_DIAMOND)  #available after initscr() has been called
 
 #set initial direction movement to the right
 key = curses.KEY_RIGHT
@@ -39,31 +40,36 @@ key = curses.KEY_RIGHT
 while True:
   next_key = window.getch()
   key = key if next_key == -1 else next_key
-  if snake[0][0] in [0, window_height] or snake[0][1] in [0, window_width]:
-    curses.endwin() #close the window
-    quit() #exit the game
+  if snake[0][0] in [0, window_height] or snake[0][1] in [
+      0, window_width
+  ] or snake[0] in snake[1:]:
+    curses.endwin()  #close the window
+    quit()  #exit the game
   new_head = [snake[0][0], snake[0][1]]
   if key == curses.KEY_DOWN:
-    new_head[0]+=1
+    new_head[0] += 1
   if key == curses.KEY_UP:
-    new_head[0]-=1
+    new_head[0] -= 1
   if key == curses.KEY_RIGHT:
-    new_head[1]+=1
+    new_head[1] += 1
   if key == curses.KEY_LEFT:
-    new_head[1]-=1
+    new_head[1] -= 1
   snake.insert(0, new_head)
-  
+
   if snake[0] == food:
     food = None
-    
+
     while food is None:
-      new_food = [random.randint(1, window_height - 1),
-                  random.randint(1, window_width - 1)]
+      new_food = [
+          random.randint(1, window_height - 1),
+          random.randint(1, window_width - 1)
+      ]
       food = new_food if new_food not in snake else None
-    window.addch(food[0], food[1], curses.ACS_PI)
+    window.addch(food[0], food[1], curses.ACS_DIAMOND)
 
   else:
+    #remove tail and put space instead
     tail = snake.pop()
     window.addch(tail[0], tail[1], ' ')
 
-  window.addch(snake[0][0], snake[0][1], curses.ACS_CKBOARD)
+  window.addch(snake[0][0], snake[0][1], curses.ACS_BLOCK)
